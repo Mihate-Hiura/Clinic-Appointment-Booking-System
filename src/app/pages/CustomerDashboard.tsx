@@ -10,6 +10,12 @@ import { Badge } from '../components/ui/badge';
 import { Calendar, Clock, User, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
+const TIME_SLOTS = [
+  '13:00', '13:30', '14:00', '14:30', '15:00', '15:30',
+  '16:00', '16:30', '17:00', '17:30', '18:00', '18:30',
+  '19:00', '19:30'
+];
+
 export function CustomerDashboard() {
   const { currentUser, appointments, users, createAppointment, logout } = useAuth();
   const navigate = useNavigate();
@@ -18,30 +24,47 @@ export function CustomerDashboard() {
   const [time, setTime] = useState('');
   const [reason, setReason] = useState('');
   const [success, setSuccess] = useState('');
+  const [error, setError] = useState('');
 
   const doctors = users.filter(u => u.role === 'doctor' && u.approved);
   const myAppointments = appointments.filter(apt => apt.customerId === currentUser?.id);
 
+  const availableDoctors = doctors.filter(doctor => {
+    if (!date || !time) return true;
+    return !appointments.some(apt => 
+      apt.doctorId === doctor.id && 
+      apt.date === date && 
+      apt.time.startsWith(time) &&
+      apt.status !== 'rejected'
+    );
+  });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+    
+    const isAutoAssign = !doctorId || doctorId === 'null';
     const doctor = doctors.find(d => d.id === doctorId);
-    if (!doctor) return;
 
-    await createAppointment({
-      doctorId,
-      doctorName: doctor.name,
-      date,
-      time,
-      reason,
-    });
+    try {
+      await createAppointment({
+        doctorId: isAutoAssign ? undefined : doctorId,
+        doctorName: doctor?.name,
+        date,
+        time,
+        reason,
+      });
 
-    setSuccess('Appointment booked successfully!');
-    setDoctorId('');
-    setDate('');
-    setTime('');
-    setReason('');
+      setSuccess('Appointment booked successfully!');
+      setDoctorId('');
+      setDate('');
+      setTime('');
+      setReason('');
 
-    setTimeout(() => setSuccess(''), 3000);
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (err: any) {
+      setError(err.message || 'Failed to book appointment');
+    }
   };
 
   const handleLogout = () => {
@@ -93,19 +116,25 @@ export function CustomerDashboard() {
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="doctor">Select Doctor</Label>
-                  <Select value={doctorId} onValueChange={setDoctorId} required>
+                  <Label htmlFor="doctor">Select Doctor (Optional)</Label>
+                  <Select value={doctorId} onValueChange={setDoctorId}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Choose a doctor" />
+                      <SelectValue placeholder="Any Available Doctor" />
                     </SelectTrigger>
                     <SelectContent>
-                      {doctors.map(doctor => (
+                      <SelectItem value="null">Any Available Doctor</SelectItem>
+                      {availableDoctors.map(doctor => (
                         <SelectItem key={doctor.id} value={doctor.id}>
                           {doctor.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
+                  {date && time && availableDoctors.length === 0 && (
+                    <p className="text-xs text-red-600 mt-1">
+                      No doctors available for this specific slot.
+                    </p>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -122,14 +151,19 @@ export function CustomerDashboard() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="time">Time</Label>
-                    <Input
-                      id="time"
-                      type="time"
-                      value={time}
-                      onChange={(e) => setTime(e.target.value)}
-                      required
-                    />
+                    <Label htmlFor="time">Time Slot</Label>
+                    <Select value={time} onValueChange={setTime} required>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Choose a slot" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {TIME_SLOTS.map(slot => (
+                          <SelectItem key={slot} value={slot}>
+                            {slot}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
 
@@ -144,6 +178,12 @@ export function CustomerDashboard() {
                     required
                   />
                 </div>
+
+                {error && (
+                  <div className="text-sm text-red-600 bg-red-50 px-4 py-3 rounded-lg">
+                    {error}
+                  </div>
+                )}
 
                 {success && (
                   <div className="text-sm text-green-600 bg-green-50 px-4 py-3 rounded-lg">

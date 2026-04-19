@@ -11,6 +11,8 @@ export function SignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [citizenId, setCitizenId] = useState('');
   const [role, setRole] = useState<UserRole>('customer');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -22,7 +24,7 @@ export function SignupPage() {
     setError('');
     setSuccess('');
 
-    if (await signup(email, password, name, role)) {
+    if (await signup(email, password, name, role, phone, citizenId)) {
       if (role === 'customer' || role === 'admin') {
         navigate('/dashboard');
       } else {
@@ -35,12 +37,12 @@ export function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neutral-50">
-      <div className="w-full max-w-md px-6">
-        <div className="text-center mb-12">
+    <div className="min-h-screen flex items-center justify-center bg-neutral-50 px-4 py-12">
+      <div className="w-full max-w-xl bg-white p-8 rounded-2xl shadow-sm border border-neutral-100">
+        <div className="text-center mb-10">
           <div className="inline-flex items-center gap-2 mb-4">
             <Activity className="w-8 h-8 text-blue-600" />
-            <span className="text-2xl font-semibold">HealthCare Clinic</span>
+            <span className="text-2xl font-semibold">Clinic Appointment Booking System</span>
           </div>
           <h1 className="text-3xl font-semibold mb-2">Create account</h1>
           <p className="text-neutral-600">Join our clinic system</p>
@@ -52,21 +54,50 @@ export function SignupPage() {
             <Input
               id="name"
               type="text"
-              placeholder="John Doe"
+              placeholder="Enter your full name"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              className="bg-neutral-50 border-none h-12"
               required
             />
           </div>
 
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="bg-neutral-50 border-none h-12"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone</Label>
+              <Input
+                id="phone"
+                type="tel"
+                placeholder="Enter your phone number"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="bg-neutral-50 border-none h-12"
+                required
+              />
+            </div>
+          </div>
+
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="citizenId">Citizen Id</Label>
             <Input
-              id="email"
-              type="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              id="citizenId"
+              type="text"
+              placeholder="Enter your citizen id"
+              value={citizenId}
+              onChange={(e) => setCitizenId(e.target.value)}
+              className="bg-neutral-50 border-none h-12"
               required
             />
           </div>
@@ -76,17 +107,18 @@ export function SignupPage() {
             <Input
               id="password"
               type="password"
-              placeholder="••••••••"
+              placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              className="bg-neutral-50 border-none h-12"
               required
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="role">Account Type</Label>
+            <Label htmlFor="role">Role</Label>
             <Select value={role} onValueChange={(value) => setRole(value as UserRole)}>
-              <SelectTrigger>
+              <SelectTrigger className="bg-neutral-50 border-none h-12">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

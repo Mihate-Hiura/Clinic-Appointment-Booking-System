@@ -7,6 +7,8 @@ export interface User {
   email: string;
   name: string;
   role: UserRole;
+  phone: string;
+  citizenId: string;
   approved: boolean;
 }
 
@@ -29,9 +31,9 @@ interface AuthContextType {
   users: User[];
   appointments: Appointment[];
   login: (email: string, password: string) => Promise<boolean>;
-  signup: (email: string, password: string, name: string, role: UserRole) => Promise<boolean>;
+  signup: (email: string, password: string, name: string, role: UserRole, phone: string, citizenId: string) => Promise<boolean>;
   logout: () => void;
-  createAppointment: (appointment: Omit<Appointment, 'id' | 'customerId' | 'customerName' | 'customerEmail' | 'status' | 'createdAt'>) => Promise<void>;
+  createAppointment: (appointment: Omit<Appointment, 'id' | 'customerId' | 'customerName' | 'customerEmail' | 'status' | 'createdAt' | 'doctorId' | 'doctorName'> & { doctorId?: string; doctorName?: string }) => Promise<void>;
   updateAppointmentStatus: (appointmentId: string, status: 'approved' | 'rejected') => Promise<void>;
   updateUserApproval: (userId: string, approved: boolean) => Promise<void>;
   refreshUsers: () => Promise<void>;
@@ -112,12 +114,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signup = async (email: string, password: string, name: string, role: UserRole): Promise<boolean> => {
+  const signup = async (email: string, password: string, name: string, role: UserRole, phone: string, citizenId: string): Promise<boolean> => {
     try {
       const res = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, name, role })
+        body: JSON.stringify({ email, password, name, role, phone, citizenId })
       });
       if (res.ok) {
         const data = await res.json();
@@ -140,7 +142,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setCurrentUser(null);
   };
 
-  const createAppointment = async (appointment: Omit<Appointment, 'id' | 'customerId' | 'customerName' | 'customerEmail' | 'status' | 'createdAt'>): Promise<void> => {
+  const createAppointment = async (appointment: Omit<Appointment, 'id' | 'customerId' | 'customerName' | 'customerEmail' | 'status' | 'createdAt' | 'doctorId' | 'doctorName'> & { doctorId?: string; doctorName?: string }): Promise<void> => {
     try {
       const res = await fetch('/api/appointments', {
         method: 'POST',

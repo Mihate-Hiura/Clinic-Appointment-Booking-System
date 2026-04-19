@@ -88,7 +88,11 @@ export function AdminDashboard() {
                     <div className="flex items-start justify-between mb-4">
                       <div>
                         <h3 className="font-semibold text-lg mb-1">{user.name}</h3>
-                        <p className="text-sm text-neutral-600 mb-2">{user.email}</p>
+                        <p className="text-sm text-neutral-600 mb-1">{user.email}</p>
+                        <div className="flex gap-4 text-xs text-neutral-500 mb-2">
+                          <span>Phone: {user.phone}</span>
+                          <span>CID: {user.citizenId}</span>
+                        </div>
                         {getRoleBadge(user.role)}
                       </div>
                       <Badge variant="secondary">Pending</Badge>
@@ -132,7 +136,11 @@ export function AdminDashboard() {
                     <div className="flex items-start justify-between">
                       <div>
                         <h3 className="font-semibold text-lg mb-1">{user.name}</h3>
-                        <p className="text-sm text-neutral-600 mb-2">{user.email}</p>
+                        <p className="text-sm text-neutral-600 mb-1">{user.email}</p>
+                        <div className="flex gap-4 text-xs text-neutral-500 mb-2">
+                          <span>Phone: {user.phone || 'N/A'}</span>
+                          <span>CID: {user.citizenId || 'N/A'}</span>
+                        </div>
                         {getRoleBadge(user.role)}
                       </div>
                       <Badge variant="default">Active</Badge>
@@ -160,6 +168,12 @@ export function AdminDashboard() {
                       Role
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-neutral-600 uppercase tracking-wider">
+                      Phone
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-neutral-600 uppercase tracking-wider">
+                      Citizen ID
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-neutral-600 uppercase tracking-wider">
                       Status
                     </th>
                   </tr>
@@ -175,6 +189,12 @@ export function AdminDashboard() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
                         {getRoleBadge(user.role)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-600">
+                        {user.phone || 'N/A'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-600">
+                        {user.citizenId || 'N/A'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
                         {user.approved ? (
