@@ -1,42 +1,70 @@
-import { useAuth } from '../context/AuthContext';
-import { Button } from '../components/ui/button';
-import { Badge } from '../components/ui/badge';
-import { Calendar, Clock, User, LogOut, CheckCircle, XCircle } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useAuth } from "../context/AuthContext";
+import { Button } from "../components/ui/button";
+import { Badge } from "../components/ui/badge";
+import {
+  Calendar,
+  Clock,
+  User,
+  LogOut,
+  CheckCircle,
+  XCircle,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export function ReceptionistDashboard() {
-  const { currentUser, appointments, updateAppointmentStatus, logout } = useAuth();
+  const { currentUser, appointments, updateAppointmentStatus, logout } =
+    useAuth();
   const navigate = useNavigate();
 
-  const pendingAppointments = appointments.filter(apt => apt.status === 'pending');
-  const processedAppointments = appointments.filter(apt => apt.status !== 'pending');
+  const pendingAppointments = appointments.filter(
+    (apt) => apt.status === "pending",
+  );
+  const processedAppointments = appointments.filter(
+    (apt) => apt.status !== "pending",
+  );
 
   const handleApprove = async (appointmentId: string) => {
-    await updateAppointmentStatus(appointmentId, 'approved');
+    await updateAppointmentStatus(appointmentId, "approved");
   };
 
   const handleReject = async (appointmentId: string) => {
-    await updateAppointmentStatus(appointmentId, 'rejected');
+    await updateAppointmentStatus(appointmentId, "rejected");
   };
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate("/login");
   };
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, 'default' | 'secondary' | 'destructive'> = {
-      pending: 'secondary',
-      approved: 'default',
-      rejected: 'destructive',
-    };
-    return <Badge variant={variants[status]}>{status}</Badge>;
+    if (status === "pending") {
+      return (
+        <Badge className="bg-blue-600 hover:bg-blue-700 text-white border-transparent">
+          Pending
+        </Badge>
+      );
+    }
+    if (status === "approved") {
+      return (
+        <Badge className="bg-green-600 hover:bg-green-700 text-white border-transparent">
+          Approved
+        </Badge>
+      );
+    }
+    if (status === "rejected") {
+      return (
+        <Badge className="bg-red-600 hover:bg-red-700 text-white border-transparent">
+          Rejected
+        </Badge>
+      );
+    }
+    return <Badge variant="default">{status}</Badge>;
   };
 
   return (
     <div className="min-h-screen bg-neutral-50">
       <header className="bg-white border-b border-neutral-200">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Calendar className="w-6 h-6 text-blue-600" />
             <span className="text-xl font-semibold">HealthCare Clinic</span>
@@ -55,16 +83,17 @@ export function ReceptionistDashboard() {
 
       <main className="max-w-7xl mx-auto px-6 py-12">
         <div className="mb-8">
-          <h1 className="text-3xl font-semibold mb-2">Appointment Management</h1>
-          <p className="text-neutral-600">Review and validate patient appointments</p>
+          <h1 className="text-3xl font-semibold mb-2">
+            Appointment Management
+          </h1>
+          <p className="text-neutral-600">
+            Review and validate patient appointments
+          </p>
         </div>
 
         <div className="space-y-12">
           <section>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold">Pending Approvals</h2>
-              <Badge variant="secondary">{pendingAppointments.length} pending</Badge>
-            </div>
+            <h2 className="text-xl font-semibold mb-6">Pending Approvals</h2>
 
             <div className="space-y-4">
               {pendingAppointments.length === 0 ? (
@@ -73,12 +102,19 @@ export function ReceptionistDashboard() {
                   <p className="text-neutral-600">No pending appointments</p>
                 </div>
               ) : (
-                pendingAppointments.map(apt => (
-                  <div key={apt.id} className="bg-white rounded-lg border border-neutral-200 p-6">
+                pendingAppointments.map((apt) => (
+                  <div
+                    key={apt.id}
+                    className="bg-white rounded-lg border border-neutral-200 p-6"
+                  >
                     <div className="flex items-start justify-between mb-4">
                       <div>
-                        <h3 className="font-semibold text-lg mb-1">{apt.customerName}</h3>
-                        <p className="text-sm text-neutral-600">{apt.customerEmail}</p>
+                        <h3 className="font-semibold text-lg mb-1">
+                          {apt.customerName}
+                        </h3>
+                        <p className="text-sm text-neutral-600">
+                          {apt.customerEmail}
+                        </p>
                       </div>
                       {getStatusBadge(apt.status)}
                     </div>
@@ -100,14 +136,15 @@ export function ReceptionistDashboard() {
 
                     <div className="mb-4 pb-4 border-b border-neutral-200">
                       <p className="text-sm text-neutral-600">
-                        <span className="font-medium">Reason:</span> {apt.reason}
+                        <span className="font-medium">Reason:</span>{" "}
+                        {apt.reason}
                       </p>
                     </div>
 
                     <div className="flex gap-3">
                       <Button
                         onClick={() => handleApprove(apt.id)}
-                        className="flex-1"
+                        className="flex-1 bg-green-600 hover:bg-green-700 text-white"
                       >
                         <CheckCircle className="w-4 h-4 mr-2" />
                         Approve
@@ -115,7 +152,7 @@ export function ReceptionistDashboard() {
                       <Button
                         onClick={() => handleReject(apt.id)}
                         variant="destructive"
-                        className="flex-1"
+                        className="flex-1 bg-red-600 hover:bg-red-700 text-white"
                       >
                         <XCircle className="w-4 h-4 mr-2" />
                         Reject
@@ -137,12 +174,19 @@ export function ReceptionistDashboard() {
                   <p className="text-neutral-600">No processed appointments</p>
                 </div>
               ) : (
-                processedAppointments.map(apt => (
-                  <div key={apt.id} className="bg-white rounded-lg border border-neutral-200 p-6">
+                processedAppointments.map((apt) => (
+                  <div
+                    key={apt.id}
+                    className="bg-white rounded-lg border border-neutral-200 p-6"
+                  >
                     <div className="flex items-start justify-between mb-4">
                       <div>
-                        <h3 className="font-semibold text-lg mb-1">{apt.customerName}</h3>
-                        <p className="text-sm text-neutral-600">{apt.customerEmail}</p>
+                        <h3 className="font-semibold text-lg mb-1">
+                          {apt.customerName}
+                        </h3>
+                        <p className="text-sm text-neutral-600">
+                          {apt.customerEmail}
+                        </p>
                       </div>
                       {getStatusBadge(apt.status)}
                     </div>
@@ -164,7 +208,8 @@ export function ReceptionistDashboard() {
 
                     <div className="mt-4 pt-4 border-t border-neutral-200">
                       <p className="text-sm text-neutral-600">
-                        <span className="font-medium">Reason:</span> {apt.reason}
+                        <span className="font-medium">Reason:</span>{" "}
+                        {apt.reason}
                       </p>
                     </div>
                   </div>

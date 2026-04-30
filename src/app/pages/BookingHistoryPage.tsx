@@ -8,12 +8,16 @@ export function BookingHistoryPage() {
   const myAppointments = appointments.filter(apt => apt.customerId === currentUser?.id);
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, 'default' | 'secondary' | 'destructive'> = {
-      pending: 'secondary',
-      approved: 'default',
-      rejected: 'destructive',
-    };
-    return <Badge variant={variants[status]}>{status}</Badge>;
+    if (status === 'pending') {
+      return <Badge className="bg-blue-600 hover:bg-blue-700 text-white border-transparent">Pending</Badge>;
+    }
+    if (status === 'approved') {
+      return <Badge className="bg-green-600 hover:bg-green-700 text-white border-transparent">Approved</Badge>;
+    }
+    if (status === 'rejected') {
+      return <Badge className="bg-red-600 hover:bg-red-700 text-white border-transparent">Rejected</Badge>;
+    }
+    return <Badge variant="default">{status}</Badge>;
   };
 
   return (
